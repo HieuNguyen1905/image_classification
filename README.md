@@ -55,7 +55,7 @@ Then install the project dependencies:
 
 ```bash
 # Clone the repository
-git clone http://gitlab.technica.vn/hieunp/image_classification.git
+git clone https://github.com/HieuNguyen1905/image_classification.git
 cd image_classification
 
 # Install dependencies with uv
@@ -165,4 +165,4 @@ Feel free to open issues or submit pull requests for improvements!
 
 ---
 
-**Project maintained by**: hieunp@technica.vn
+**Project maintained by**: hieu.nguyenphuc1905@gmail.com
