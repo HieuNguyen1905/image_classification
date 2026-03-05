@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torchvision import models
-from utils.load_config import load_config, save_config
+from utils.load_config import load_config
 
 cudnn.benchmark = True
 
@@ -14,7 +14,7 @@ def load_model():
     NUMCLASS = config['MODEL']['NUMCLASS'] if config['MODEL']['NUMCLASS'] else 2
 
     try:
-        # resnet
+        # Resnet
         if MODEL_NAME == "resnet18":            
             if CHECKPOINT:
                 model = models.resnet18(pretrained=False)

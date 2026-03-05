@@ -3,7 +3,7 @@ import os
 from sklearn.metrics import accuracy_score, f1_score
 import torch
 import torch.backends.cudnn as cudnn
-from utils.load_config import load_config, save_config
+from utils.load_config import load_config
 
 cudnn.benchmark = True
 
