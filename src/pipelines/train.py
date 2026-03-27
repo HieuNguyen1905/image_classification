@@ -3,11 +3,11 @@ import json
 from torch.optim import lr_scheduler
 import torch.backends.cudnn as cudnn
 
-from utils.load_model import load_model
-from utils.load_data import load_data
-from utils.load_optim import load_optimization
-from utils.load_loss import load_loss_function
-from utils.train_model import train_model
+from models.load_model import load_model
+from datasets.load_data import load_data
+from training.load_optim import load_optimization
+from loss.load_loss import load_loss_function
+from training.train_model import train_model
 from utils.load_config import load_config
 
 import warnings

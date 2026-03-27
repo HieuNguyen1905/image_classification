@@ -8,9 +8,9 @@ from PIL import Image
 
 cudnn.benchmark = True
 
-from utils.load_model import load_model
+from models.load_model import load_model
 from utils.load_config import load_config
-from utils.predict_model import predict
+from training.predict_model import predict
 
 config = load_config('config.yaml')
 IMG_SIZE = config['DATA']['IMG_SIZE'] if config['DATA']['IMG_SIZE'] else (224, 224)
