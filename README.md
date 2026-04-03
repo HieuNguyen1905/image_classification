@@ -1,76 +1,92 @@
 # Simple CV - Image Classification
 
-A PyTorch-based image classification project for classifying images into three categories: **cat**, **duck**, and **panda**. This project provides a clean and modular structure for training and inference using deep learning models.
+<p align="center">
+  <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*OmKhW6JSe8wpKt-n1XAJNw.gif" alt="Image classification demo" width="720" />
+</p>
 
-## Features
+A compact PyTorch project for classifying images into three classes: **cat**, **duck**, and **panda**. The codebase is organized for training, prediction, and configuration management, making it suitable for quick experiments or as a base for a more complete image classification pipeline.
 
-- 🔥 **PyTorch-based** - Built with PyTorch and TorchVision
-- 🚀 **Easy to configure** - All settings managed through `config.yaml`
-- 📊 **Multiple models** - Support for various CNN architectures (ResNet18 by default)
-- 💾 **Weight management** - Automatic saving of best weights and epoch checkpoints
-- 🎯 **Batch prediction** - Efficient batch inference on test images
-- 🔧 **Modular design** - Clean separation of concerns with utility modules
+## Highlights
+
+- Training and inference with PyTorch and TorchVision.
+- Support for multiple ResNet backbones, with `resnet50` as the default.
+- Automatic checkpoint saving by epoch, plus the best model when `SAVE_BEST` is enabled.
+- Batch prediction for efficient inference on multiple images.
+- Centralized configuration via YAML.
 
 ## Project Structure
 
-```
-simple_cv/
+```text
+image_classification/
+├── configs/
+│   └── config.yaml
 ├── data/
-│   ├── train/          # Training data
+│   ├── train/
 │   │   ├── cat/
 │   │   ├── duck/
 │   │   └── panda/
-│   └── val/            # Validation data
+│   └── val/
 │       ├── cat/
 │       ├── duck/
 │       └── panda/
 ├── src/
-│   ├── config.yaml     # Configuration file
-│   ├── train.py        # Training script
-│   ├── predict.py      # Prediction script
-│   └── utils/          # Utility modules
-│       ├── load_config.py
-│       ├── load_data.py
-│       ├── load_loss.py
-│       ├── load_model.py
-│       ├── load_optim.py
-│       ├── predict_model.py
-│       └── train_model.py
-├── weights/            # Saved model weights
-├── test_img/           # Test images for prediction
-├── pyproject.toml      # Project dependencies
+│   ├── datasets/
+│   │   └── load_data.py
+│   ├── loss/
+│   │   └── load_loss.py
+│   ├── models/
+│   │   └── load_model.py
+│   ├── pipelines/
+│   │   ├── train.py
+│   │   └── predict.py
+│   ├── training/
+│   │   ├── load_optim.py
+│   │   ├── predict_model.py
+│   │   └── train_model.py
+│   └── utils/
+│       └── load_config.py
+├── pyproject.toml
 └── README.md
 ```
 
 ## Installation
 
-This project uses [uv](https://docs.astral.sh/uv/) for dependency management. If you don't have `uv` installed:
+The project uses `uv` for dependency management.
 
 ```bash
-# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Then install the project dependencies:
-
-```bash
-# Clone the repository
 git clone https://github.com/HieuNguyen1905/image_classification.git
 cd image_classification
-
-# Install dependencies with uv
 uv sync
 ```
 
-Alternatively, you can use pip:
+If you prefer `pip`, install the main dependencies manually:
 
 ```bash
-pip install torch torchvision pillow pyyaml matplotlib pandas scikit-learn
+pip install torch torchvision pillow pyyaml pandas matplotlib scikit-learn
 ```
+
+## Dataset Setup
+
+Your dataset should be organized like this:
+
+```text
+data/
+├── train/
+│   ├── cat/
+│   ├── duck/
+│   └── panda/
+└── val/
+    ├── cat/
+    ├── duck/
+    └── panda/
+```
+
+Each subfolder must contain images from exactly one class.
 
 ## Configuration
 
-Edit `src/config.yaml` to customize your training:
+The configuration file is located at [configs/config.yaml](configs/config.yaml).
 
 ```yaml
 CLASSNAME:
@@ -85,51 +101,71 @@ DATA:
   NUM_WORKERS: 4
 
 MODEL:
-  MODEL_NAME: resnet18    # Can use other models (resnet50, vgg16, etc.)
+  MODEL_NAME: resnet50
   NUMCLASS: 3
   EPOCHS: 30
   LEARNING_RATE: 1.0e-05
   LOSS_FUNCTION: CrossEntropyLoss
   OPTIM_FUNCTION: Adam
-  CHECKPOINT: ''          # Path to pretrained weights (optional)
+  CHECKPOINT: ''
 
 WEIGHT:
   SAVE_WEIGHT_PATH: ../weights
   SAVE_BEST: true
 ```
 
-## Usage
-
-### Training
-
-Navigate to the `src` directory and run:
+Important: the current scripts read `config.yaml` from the working directory. The safest way to run the project is to copy the config file into `src/` before training or predicting:
 
 ```bash
-cd src
-python train.py
+cp configs/config.yaml src/config.yaml
 ```
 
-The training script will:
-- Load data from `data/train` and `data/val`
-- Train the model for the specified number of epochs
-- Save the best model weights to `weights/best.pt`
-- Save epoch checkpoints to `weights/epoch_N.pt`
-- Use GPU automatically if available
+## Training
 
-### Prediction
-
-Run inference on test images:
+Run the training script from the `src` directory:
 
 ```bash
 cd src
-python predict.py --test_path ../test_img --batch_predict 8
+python pipelines/train.py
+```
+
+The training pipeline will:
+
+- Load data from `data/train` and `data/val`.
+- Fine-tune the selected model from `config.yaml`.
+- Save checkpoints for each epoch in the `weights/` directory.
+- Save the best model to `weights/best.pt` when `SAVE_BEST` is enabled.
+- Automatically use GPU if one is available.
+
+## Prediction
+
+Run inference on a single image or a directory of images:
+
+```bash
+cd src
+python pipelines/predict.py --test_path ../test_img --batch_predict 8
 ```
 
 Arguments:
-- `--test_path`: Path to the directory containing test images
-- `--batch_predict`: Batch size for prediction
+
+- `--test_path`: path to an image file or a directory of images.
+- `--batch_predict`: batch size used during inference.
 
 The predictions will be saved to `predict.csv` in the project root.
+
+## Model and Training Setup
+
+- Supported backbones: `resnet18`, `resnet34`, `resnet50`, `resnet101`, and `resnet152`.
+- Default loss: `CrossEntropyLoss`.
+- Default optimizer: `Adam`.
+- Scheduler: `StepLR`, reducing the learning rate every 7 epochs by a factor of `0.1`.
+- Default image size: `224 x 224`.
+
+## Generated Artifacts
+
+- `weights/best.pt`: best checkpoint by validation F1.
+- `weights/epoch_*.pt`: checkpoint for each epoch.
+- `predict.csv`: prediction output file.
 
 ## Requirements
 
@@ -142,27 +178,5 @@ The predictions will be saved to `predict.csv` in the project root.
 - matplotlib >= 3.10.8
 - scikit-learn >= 1.8.0
 
-## Model Training Details
 
-- **Architecture**: ResNet18 (configurable)
-- **Optimizer**: Adam with learning rate 1e-5
-- **Loss Function**: CrossEntropyLoss
-- **Learning Rate Scheduler**: StepLR (decay by 0.1 every 7 epochs)
-- **Image Size**: 224x224 pixels
-- **Batch Size**: 16 (configurable)
-
-## GPU Support
-
-The project automatically detects and uses CUDA-enabled GPUs if available. Training will fall back to CPU if no GPU is detected.
-
-## License
-
-See [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Feel free to open issues or submit pull requests for improvements!
-
----
-
-**Project maintained by**: hieu.nguyenphuc1905@gmail.com
+Project maintained by hieu.nguyenphuc1905@gmail.com
