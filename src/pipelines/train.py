@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+
+# Add src directory to Python path
+src_dir = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(src_dir))
+
 import torch
 import json
 from torch.optim import lr_scheduler

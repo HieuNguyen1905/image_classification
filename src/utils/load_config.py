@@ -1,8 +1,14 @@
 import yaml
+from pathlib import Path
+
+# Project root directory (image_classification/)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+CONFIGS_DIR = PROJECT_ROOT / "configs"
 
 def load_config(config_file):
     try:
-        with open(config_file, "r") as f:
+        config_path = CONFIGS_DIR / config_file
+        with open(config_path, "r") as f:
             config = yaml.safe_load(f)
         return config
     except Exception as e:

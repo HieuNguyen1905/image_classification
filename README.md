@@ -31,21 +31,31 @@ image_classification/
 │       └── panda/
 ├── src/
 │   ├── datasets/
+│   │   ├── __init__.py
 │   │   └── load_data.py
 │   ├── loss/
+│   │   ├── __init__.py
 │   │   └── load_loss.py
 │   ├── models/
+│   │   ├── __init__.py
 │   │   └── load_model.py
 │   ├── pipelines/
+│   │   ├── __init__.py
 │   │   ├── train.py
 │   │   └── predict.py
 │   ├── training/
+│   │   ├── __init__.py
 │   │   ├── load_optim.py
 │   │   ├── predict_model.py
 │   │   └── train_model.py
 │   └── utils/
+│       ├── __init__.py
 │       └── load_config.py
+├── weights/
+│   ├── best.pt
+│   └── epoch_*.pt
 ├── pyproject.toml
+├── uv.lock
 └── README.md
 ```
 
@@ -114,12 +124,6 @@ WEIGHT:
   SAVE_BEST: true
 ```
 
-Important: the current scripts read `config.yaml` from the working directory. The safest way to run the project is to copy the config file into `src/` before training or predicting:
-
-```bash
-cp configs/config.yaml src/config.yaml
-```
-
 ## Training
 
 Run the training script from the `src` directory:
@@ -160,6 +164,21 @@ The predictions will be saved to `predict.csv` in the project root.
 - Default optimizer: `Adam`.
 - Scheduler: `StepLR`, reducing the learning rate every 7 epochs by a factor of `0.1`.
 - Default image size: `224 x 224`.
+
+## Training Results
+
+Training on the cat/duck/panda dataset with `resnet50` backbone for 30 epochs:
+
+| Epoch | Train Loss | Train Acc | Train F1 | Val Loss | Val Acc | Val F1 |
+|-------|------------|-----------|----------|----------|---------|--------|
+| 0     | 1.1331     | 46.51%    | 0.3757   | 1.0684   | 53.85%  | 0.4127 |
+| 5     | 0.8738     | 69.77%    | 0.6767   | 0.7511   | 84.62%  | 0.8244 |
+| 10    | 0.7426     | 86.05%    | 0.8609   | 0.6819   | 92.31%  | 0.9267 |
+| 14    | 0.6926     | 93.02%    | 0.9313   | 0.7192   | 92.31%  | 0.9267 |
+| 20    | 0.7452     | 86.05%    | 0.8594   | 0.7052   | 92.31%  | 0.9267 |
+| 29    | 0.7294     | 86.05%    | 0.8594   | 0.6989   | 92.31%  | 0.9267 |
+
+**Best validation F1 score: 0.9267** (achieved at epoch 6 and maintained through epoch 29)
 
 ## Generated Artifacts
 
