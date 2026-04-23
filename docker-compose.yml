@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simpecv-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Optional: Mount weights/configs directly so you can change them without rebuilding the image
+      - ./weights:/app/weights
+      - ./configs:/app/configs
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: simpecv-frontend
+    ports:
+      - "5173:80"  # Mapping container port 80 to host's 5173
+    depends_on:
+      - backend
+    restart: unless-stopped

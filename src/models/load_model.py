@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
+from pathlib import Path
 from torchvision import models
 from utils.load_config import load_config
 
@@ -12,12 +13,18 @@ def load_model():
     MODEL_NAME = config['MODEL']['MODEL_NAME'] if config['MODEL']['MODEL_NAME'] else 'resnet50'
     CHECKPOINT = config['MODEL']['CHECKPOINT'] if config['MODEL']['CHECKPOINT'] else ''
     NUMCLASS = config['MODEL']['NUMCLASS'] if config['MODEL']['NUMCLASS'] else 2
+    
+    # Resolve checkpoint path from project root
+    if CHECKPOINT:
+        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+        checkpoint_path = PROJECT_ROOT / CHECKPOINT.lstrip('../')
+        CHECKPOINT = str(checkpoint_path)
 
     try:
         # Resnet
         if MODEL_NAME == "resnet18":            
             if CHECKPOINT:
-                model = models.resnet18(pretrained=False)
+                model = models.resnet18(weights=None)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
 
                 if not torch.cuda.is_available():
@@ -28,7 +35,7 @@ def load_model():
                 model.load_state_dict(checkpoint['model_state_dict'])
                 
             else: 
-                model = models.resnet18(pretrained=True)
+                model = models.resnet18(weights='DEFAULT')
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
             # freeze all layers
             for param in model.parameters():
@@ -42,7 +49,7 @@ def load_model():
         
         elif MODEL_NAME == "resnet34":            
             if CHECKPOINT:
-                model = models.resnet34(pretrained=False)
+                model = models.resnet34(weights=None)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
 
                 if not torch.cuda.is_available():
@@ -53,7 +60,7 @@ def load_model():
                 model.load_state_dict(checkpoint['model_state_dict'])
                 
             else: 
-                model = models.resnet34(pretrained=True)
+                model = models.resnet34(weights='DEFAULT')
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
             # freeze all layers
             for param in model.parameters():
@@ -67,7 +74,7 @@ def load_model():
         
         elif MODEL_NAME == "resnet50":            
             if CHECKPOINT:
-                model = models.resnet50(pretrained=False)
+                model = models.resnet50(weights=None)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
 
                 if not torch.cuda.is_available():
@@ -78,7 +85,7 @@ def load_model():
                 model.load_state_dict(checkpoint['model_state_dict'])
                 
             else: 
-                model = models.resnet50(pretrained=True)
+                model = models.resnet50(weights='DEFAULT')
                 # print(model)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
             # freeze all layers
@@ -93,7 +100,7 @@ def load_model():
         
         elif MODEL_NAME == "resnet101":            
             if CHECKPOINT:
-                model = models.resnet101(pretrained=False)
+                model = models.resnet101(weights=None)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
 
                 if not torch.cuda.is_available():
@@ -104,7 +111,7 @@ def load_model():
                 model.load_state_dict(checkpoint['model_state_dict'])
                 
             else: 
-                model = models.resnet101(pretrained=True)
+                model = models.resnet101(weights='DEFAULT')
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
             # freeze all layers
             for param in model.parameters():
@@ -118,7 +125,7 @@ def load_model():
         
         elif MODEL_NAME == "resnet152":            
             if CHECKPOINT:
-                model = models.resnet152(pretrained=False)
+                model = models.resnet152(weights=None)
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
 
                 if not torch.cuda.is_available():
@@ -129,7 +136,7 @@ def load_model():
                 model.load_state_dict(checkpoint['model_state_dict'])
                 
             else: 
-                model = models.resnet152(pretrained=True)
+                model = models.resnet152(weights='DEFAULT')
                 model.fc = nn.Linear(model.fc.in_features, NUMCLASS)
             # freeze all layers
             for param in model.parameters():
