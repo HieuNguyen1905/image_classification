@@ -1,7 +1,14 @@
 CLASSNAME:
-- cat
-- duck
-- panda
+- cane
+- cavallo
+- elefante
+- farfalla
+- gallina
+- gatto
+- mucca
+- pecora
+- ragno
+- scoiattolo
 DATA:
   BATCHSIZES: 16
   DATA_DIR: ../data
@@ -15,7 +22,7 @@ MODEL:
   LEARNING_RATE: 1.0e-05
   LOSS_FUNCTION: CrossEntropyLoss
   MODEL_NAME: resnet50
-  NUMCLASS: 3
+  NUMCLASS: 10
   OPTIM_FUNCTION: Adam
 WEIGHT:
   SAVE_BEST: true
