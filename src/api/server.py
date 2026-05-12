@@ -6,9 +6,9 @@ src_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(src_dir))
 
 import torch
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 from models.load_model import load_model
 from utils.load_config import load_config
@@ -26,6 +26,10 @@ app.add_middleware(
 
 # 1. Khởi tạo Global Variables (Chỉ load model 1 lần khi start server)
 config = load_config('config.yaml')
+if not config:
+    raise RuntimeError(
+        "Missing config.yaml. Mount ./configs to /app/configs or set CONFIG_PATH to an absolute file path."
+    )
 IMG_SIZE = config['DATA']['IMG_SIZE'] or (224, 224)
 CLASS_NAMES = config['CLASSNAME']
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -47,7 +51,25 @@ model.eval()
 async def predict_api(file: UploadFile = File(...)) -> dict:
     # 2. Nhận ảnh từ request
     image_bytes = await file.read()
-    image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="File must be an image.",
+        )
+    if not image_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Empty file.",
+        )
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        image.verify()
+    except (UnidentifiedImageError, OSError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid image file.",
+        )
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     
     # 3. Tiền xử lý (Sử dụng đúng transform bạn đã định nghĩa)
     input_tensor = data_transforms(image).unsqueeze(0).to(device)
