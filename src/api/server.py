@@ -18,7 +18,7 @@ app = FastAPI(title="Image Classification Serving")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (or specify ["http://localhost:5173"] for production)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,7 +34,7 @@ IMG_SIZE = config['DATA']['IMG_SIZE'] or (224, 224)
 CLASS_NAMES = config['CLASSNAME']
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Giữ nguyên data_transforms từ predict.py của bạn
+# transform input
 from torchvision import transforms
 data_transforms = transforms.Compose([
     transforms.Resize(IMG_SIZE),
@@ -71,7 +71,7 @@ async def predict_api(file: UploadFile = File(...)) -> dict:
         )
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     
-    # 3. Tiền xử lý (Sử dụng đúng transform bạn đã định nghĩa)
+    # 3. Image Preprocessing
     input_tensor = data_transforms(image).unsqueeze(0).to(device)
     
     # 4. Inference
@@ -80,7 +80,7 @@ async def predict_api(file: UploadFile = File(...)) -> dict:
         _, preds = torch.max(outputs, 1)
         prob = torch.nn.functional.softmax(outputs, dim=1)
         
-    # 5. Trả về JSON (Online Prediction style)
+    # 5. JSON Response
     return {
         "filename": file.filename,
         "prediction": CLASS_NAMES[preds[0]],
@@ -89,4 +89,4 @@ async def predict_api(file: UploadFile = File(...)) -> dict:
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Image Classification API. Use /predict endpoint to classify images."}
-# Để chạy: uvicorn src.serving.app:app --reload
+# Run: uvicorn src.serving.app:app --reload
