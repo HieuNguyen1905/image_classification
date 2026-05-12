@@ -3,13 +3,16 @@ FROM python:3.12-slim
 # Set working directory
 WORKDIR /app
 
-# Upgrade pip and install build tools
+# Upgrade pip and install uv
 RUN pip install --upgrade pip && \
-    pip install setuptools wheel
+    pip install uv
 
 # Install dependencies before code to cache layer
-COPY pyproject.toml README.md ./
-RUN pip install --no-cache-dir .
+COPY pyproject.toml uv.lock ./
+
+RUN uv sync --frozen
+
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy remaining code (configs, weights, src)
 COPY . .
